@@ -237,27 +237,14 @@ app.post("/api/login", async (req, res) => {
 app.post('/api/check', async (req, res) => {
     try {
         const { url } = req.body || {};
-        if (!url) return res.status(400).json({ error: 'Missing url in body' });
+        const response = await fetch("http://127.0.0.1:8001/predict?url=" + url, {
+            method: "POST"
+        });
 
-        // ✅ Get token from HttpOnly cookie
-        const token = req.cookies.token;
-        if (!token) return res.status(200).json({ error: "Unauthorized" });
-
-        // ✅ Verify token and extract email
-        const decoded = jwt.verify(token, "12345");
-        const email = decoded.email;
-
-        // ✅ Run phishing detection
-        const result = scoreUrl(url);
-
-        // ✅ Save to database
-        await sql.query(
-            "INSERT INTO allurls (email, url, status) VALUES ($1, $2, $3)",
-            [email, url, result.verdict]
-        );
-
+        const data = await response.json();
         // ✅ Send result back to frontend
-        res.json(result);
+        console.log(data)
+        res.json(data);
 
     } catch (err) {
         res.status(500).json({ error: "Server error" });

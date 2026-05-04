@@ -63,6 +63,7 @@ export default function Home() {
             )
             const data = res.data;
             setResult(data);
+            console.log("rsult", result)
             await fetchHistory();
         } catch (err) {
             console.log(err);
@@ -113,13 +114,13 @@ export default function Home() {
                         ) : (
                             <div className="p-4 rounded-xl shadow-sm bg-white">
                                 <h2 className="text-lg font-semibold">
-                                    Verdict: {result.verdict === "suspicious" ? (
+                                    Verdict: {result.is_phishing == true ? (
                                         <span className="text-red-600">suspicious</span>
                                     ) : (
                                         <span className="text-green-600">Legitimate</span>
                                     )}
                                 </h2>
-                                <p className="text-sm text-slate-500">Score: {result.score} / 100</p>
+                                <p className="text-sm text-slate-500">Score: {Math.floor(100 - result.probability * 100)} / 100</p>
 
                                 <div className="mt-4">
                                     <h3 className="text-sm font-medium text-slate-700">Reasons</h3>
