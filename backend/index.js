@@ -237,6 +237,14 @@ app.post("/api/login", async (req, res) => {
 app.post('/api/check', async (req, res) => {
     try {
         const { url } = req.body || {};
+        const token = await req.cookies.token; // ✅ get token from cookie
+        console.log("token", token)
+        if (!token) {
+            return res.status(401).json({ error: "Unauthorized" });
+        }
+
+        const decoded = jwt.verify(token, "12345"); // same secret as login
+        const email = decoded.email;
         const response = await fetch("http://127.0.0.1:8001/predict?url=" + url, {
             method: "POST"
         });
@@ -244,6 +252,10 @@ app.post('/api/check', async (req, res) => {
         const data = await response.json();
         // ✅ Send result back to frontend
         console.log(data)
+        await sql.query(
+            "INSERT INTO allurls (email, url, status) VALUES ($1, $2, $3)",
+            [email, url, !data.is_phishing ? 'Legitimate' : 'suspicious']
+        );
         res.json(data);
 
     } catch (err) {
@@ -258,25 +270,30 @@ app.post('/api/checkextension', async (req, res) => {
 
 
         // ✅ Run phishing detection
-        const result = scoreUrl(url);
+        const response = await fetch("http://127.0.0.1:8001/predict?url=" + url, {
+            method: "POST"
+        });
+
+        const data = await response.json();
 
         const email = 'example@project.com'
         // ✅ Save to database
         await sql.query(
             "INSERT INTO allurls (email, url, status) VALUES ($1, $2, $3)",
-            [email, url, result.verdict]
+            [email, url, !data.is_phishing ? 'Legitimate' : 'suspicious']
         );
         // ✅ Send result back to frontend
-        res.json(result);
+        console.log(data)
+        res.json(data);
 
     } catch (err) {
-        res.status(500).json({ error: "Server error" });
+        res.status(500).json({ error: "Server error :", err });
     }
 });
 app.get("/api/history", async (req, res) => {
     try {
-        const token = req.cookies.token; // ✅ get token from cookie
-
+        const token = await req.cookies.token; // ✅ get token from cookie
+        console.log("token", token)
         if (!token) {
             return res.status(401).json({ error: "Unauthorized" });
         }
