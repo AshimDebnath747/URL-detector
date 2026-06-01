@@ -245,7 +245,7 @@ app.post('/api/check', async (req, res) => {
 
         const decoded = jwt.verify(token, "12345"); // same secret as login
         const email = decoded.email;
-        const response = await fetch("http://127.0.0.1:8001/predict?url=" + url, {
+        const response = await fetch("http://127.0.0.1:8000/predict?url=" + url, {
             method: "POST"
         });
 
@@ -270,7 +270,7 @@ app.post('/api/checkextension', async (req, res) => {
 
 
         // ✅ Run phishing detection
-        const response = await fetch("http://127.0.0.1:8001/predict?url=" + url, {
+        const response = await fetch("http://127.0.0.1:8000/predict?url=" + url, {
             method: "POST"
         });
 
