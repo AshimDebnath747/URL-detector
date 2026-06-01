@@ -185,35 +185,22 @@ cd project-name
 ### Install Frontend Dependencies
 
 ```bash
-cd client
+cd frontend
 npm install
 ```
 
 ### Install Backend Dependencies
 
 ```bash
-cd server
+cd backend
 npm install
 ```
 
 ### Install Python Dependencies
 
 ```bash
+cd backend/microservices
 pip install -r requirements.txt
-```
-
----
-
-## Environment Variables
-
-Create a .env file inside the server directory.
-
-```env
-PORT=5000
-
-DATABASE_URL=your_neondb_connection_string
-
-JWT_SECRET=your_secret_key
 ```
 
 ---
@@ -235,7 +222,7 @@ npm start
 ### Start Python Prediction Service
 
 ```bash
-python predictor.py
+uvicorn ml_api:app --reload --port 8000
 ```
 
 ---
@@ -245,22 +232,15 @@ python predictor.py
 ### Predict URL
 
 ```http
-POST /api/predict
-```
-
-Request Body
-
-```json
-{
-  "url": "https://example.com"
-}
+POST /api/predict?url=your_url
 ```
 
 Response
 
 ```json
 {
-  "prediction": "Legitimate"
+    "probability": 2.3341497263915417e-05,
+    "is_phishing": false
 }
 ```
 
